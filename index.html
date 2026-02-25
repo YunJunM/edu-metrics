@@ -27,3 +27,88 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 hover-card">
+                <h3 class="font-bold text-gray-400 uppercase text-xs tracking-widest mb-2">통합 지표</h3>
+                <p class="text-3xl font-black text-indigo-600">89.4%</p>
+                <p class="text-sm text-gray-500 mt-2">디지털 교육 인프라 달성률</p>
+            </div>
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 hover-card">
+                <h3 class="font-bold text-gray-400 uppercase text-xs tracking-widest mb-2">지역 현안</h3>
+                <p class="text-3xl font-black text-rose-500">12개교</p>
+                <p class="text-sm text-gray-500 mt-2">금년도 통폐합 대상교 (전국)</p>
+            </div>
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 hover-card">
+                <h3 class="font-bold text-gray-400 uppercase text-xs tracking-widest mb-2">예산 집행</h3>
+                <p class="text-3xl font-black text-emerald-500">76.2%</p>
+                <p class="text-sm text-gray-500 mt-2">교육청 AI 도입 예산 집행률</p>
+            </div>
+        </div>
+
+        <div class="bg-white p-10 rounded-3xl shadow-xl border border-slate-100 mb-20 overflow-hidden relative">
+            <div class="absolute top-0 right-0 p-6">
+                <span class="bg-indigo-600 text-white text-xs font-black px-4 py-2 rounded-full uppercase tracking-tighter">Focus Case</span>
+            </div>
+            
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="w-full lg:w-1/2">
+                    <div class="mb-6">
+                        <h3 class="text-2xl font-black text-slate-900 mb-2">🌍 글로벌 교육 트렌드 레이더</h3>
+                        <p class="text-slate-500">주요 국가별 디지털 교육 도입 지수 (2026 기준)</p>
+                    </div>
+                    <canvas id="worldEduChart" class="max-h-[300px]"></canvas>
+                </div>
+
+                <div class="w-full lg:w-1/2 space-y-6">
+                    <div class="bg-indigo-50 p-6 rounded-2xl border-l-8 border-indigo-600">
+                        <h4 class="text-xl font-bold text-indigo-900 mb-2">에스토니아: AI 교사 지원의 정석</h4>
+                        <p class="text-indigo-800 leading-relaxed">
+                            에스토니아는 세계 최고 수준의 디지털 거버넌스를 통해 교사의 행정 부담을 획기적으로 줄였습니다. 단순 수치를 넘어 그들의 <strong>실제 운영 방식</strong>을 분석할 필요가 있습니다.
+                        </p>
+                    </div>
+                    
+                    <div class="flex flex-col gap-4">
+                        <p class="text-slate-600">이 지표가 우리 교육 정책 현장에 주는 시사점이 궁금하신가요?</p>
+                        <a href="estonia-ai.html" class="inline-flex justify-center items-center px-8 py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-indigo-700 hover:scale-105 transition-all shadow-lg">
+                            에스토니아 사례 상세 분석 읽기 →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="py-12 border-t border-slate-200 text-center">
+            <p class="text-slate-400 text-sm">© 2026 EDU-METRICS INSIGHT. 본 대시보드는 교육정책네트워크 발간물을 기반으로 제작되었습니다.</p>
+        </footer>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('worldEduChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['에스토니아', '네덜란드', '스웨덴', '대한민국'],
+                datasets: [{
+                    label: '디지털 전환 지수',
+                    data: [94, 89, 87, 81],
+                    backgroundColor: [
+                        'rgba(99, 102, 241, 0.9)', 
+                        'rgba(99, 102, 241, 0.6)', 
+                        'rgba(99, 102, 241, 0.4)',
+                        'rgba(244, 63, 94, 0.8)' // 한국은 강조색
+                    ],
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, max: 100 }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
