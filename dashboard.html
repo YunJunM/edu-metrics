@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교육 이슈 상세 분석 대시")보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // 상세 데이터 정의
+        const details = {
+            '늘봄': {
+                tag: '늘봄학교',
+                title: '늘봄학교 전국 확대... 핵심 정리',
+                body: `<p class="font-bold text-blue-800 text-xl mb-4">"돌봄의 국가 책임제 본격 시행"</p>
+                       <p>교육부는 올해 전국 모든 초등학교에서 늘봄학교를 시행합니다. 공간 확보율 100%를 달성했으며 늘봄전담사 배치를 완료했습니다.</p>
+                       <ul class="list-disc ml-5 mt-4 space-y-2">
+                           <li>초1 전용 늘봄교실 확보율 100% 달성</li>
+                           <li>늘봄전담사 배치를 통한 교사 업무 경감</li>
+                           <li>거점형 늘봄센터 20개소 추가 개소</li>
+                       </ul>`,
+                insight: '정부는 돌봄과 안전이라는 두 마리 토끼를 잡으려 노력 중입니다. 현장 안착의 핵심은 실무 분리가 될 것입니다.'
+            },
+            '폐교': {
+                tag: '폐교 활용',
+                title: '전남·경북 등 폐교 활용 지역상생 모델',
+                body: `<p class="font-bold text-teal-800 text-xl mb-4">"마을의 새로운 심장으로!"</p>
+                       <p>전남과 경북을 중심으로 폐교를 스마트팜, 마을 도서관, 야영장 등으로 개방하여 지역 소멸에 대응합니다.</p>
+                       <ul class="list-disc ml-5 mt-4 space-y-2">
+                           <li>폐교를 첨단 수직 농장(스마트팜)으로 개조</li>
+                           <li>문화 공간 및 캠핑장으로 개방하여 관광객 유치</li>
+                       </ul>`,
+                insight: '지자체와의 유기적인 협조가 폐교 활용 모델의 지속성을 결정할 것입니다.'
+            },
+            '대입': {
+                tag: '대입 개편',
+                title: '2028 대입 개편안 관련 고교 현장 혼란',
+                body: `<p class="font-bold text-rose-800 text-xl mb-4">"심화수학 제외, 변별력 확보가 관건"</p>
+                       <p>심화수학 미도입으로 인한 상위권 변별력 상실 우려가 큽니다. 대학들은 수능 외 내신이나 면접 비중을 높일 것으로 예측됩니다.</p>`,
+                insight: '정교한 수능 출제 기조를 통해 변별력을 유지하는 것이 중요해졌습니다.'
+            }
+        };
+
+        function openModal(key) {
+            const data = details[key];
+            document.getElementById('modalTag').innerText = data.tag;
+            document.getElementById('modalTitle').innerText = data.title;
+            document.getElementById('modalBody').innerHTML = data.body;
+            document.getElementById('modalInsight').innerText = "💡 " + data.insight;
+            document.getElementById('detailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+    <nav class="bg-indigo-900 p-4 shadow-lg sticky top-0 z-50 text-white">
+        <div class="container mx-auto flex justify-between items-center text-white">
+            <a href="index.html" class="bg-white/10 px-3 py-1.5 rounded font-bold text-sm">🏠 HOME</a>
+            <h1 class="text-lg font-bold">EDU ISSUE ANALYSIS</h1>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-10 max-w-6xl">
+        <h2 class="text-3xl font-bold mb-8 text-gray-900 font-extrabold">오늘의 상세 브리핑</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <button onclick="openModal('늘봄')" class="text-left bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all">
+                <span class="text-blue-600 text-xs font-bold bg-blue-50 px-2 py-1 rounded">늘봄학교</span>
+                <h3 class="text-xl font-bold mt-4">늘봄학교 전국 확대... 핵심 정리</h3>
+                <p class="text-blue-600 mt-4 font-bold underline">상세 분석 보기 &rarr;</p>
+            </button>
+            <button onclick="openModal('폐교')" class="text-left bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all">
+                <span class="text-teal-600 text-xs font-bold bg-teal-50 px-2 py-1 rounded">폐교 활용</span>
+                <h3 class="text-xl font-bold mt-4">폐교 활용 지역상생 모델 가속화</h3>
+                <p class="text-teal-600 mt-4 font-bold underline">상세 분석 보기 &rarr;</p>
+            </button>
+            <button onclick="openModal('대입')" class="text-left bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all">
+                <span class="text-rose-600 text-xs font-bold bg-rose-50 px-2 py-1 rounded">대입 개편</span>
+                <h3 class="text-xl font-bold mt-4">2028 대입 개편안 관련 현장 혼란</h3>
+                <p class="text-rose-600 mt-4 font-bold underline">상세 분석 보기 &rarr;</p>
+            </button>
+        </div>
+    </div>
+
+    <div id="detailModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4" onclick="if(event.target == this) closeModal()">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
+            <div class="sticky top-0 bg-white border-b p-5 flex justify-between items-center">
+                <span id="modalTag" class="bg-gray-100 px-3 py-1 rounded text-xs font-bold">분석</span>
+                <button onclick="closeModal()" class="text-3xl text-gray-400 hover:text-black">&times;</button>
+            </div>
+            <div class="p-8">
+                <h2 id="modalTitle" class="text-2xl font-extrabold mb-6">제목</h2>
+                <div id="modalBody" class="text-gray-700 leading-relaxed space-y-4"></div>
+                <div id="modalInsight" class="mt-8 p-6 bg-amber-50 rounded-xl border border-amber-100 text-amber-900 text-sm italic"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

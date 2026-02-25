@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>최근 폐교 가속화 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+   <nav class="bg-rose-800 p-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center text-white">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded font-bold text-sm transition-colors">🏠 HOME</a>
+                <h1 class="text-xl font-bold tracking-tight hidden md:block">🚨 최근 학교 통폐합 가속화 리포트</h1>
+            </div>
+            <span class="text-sm bg-rose-600 py-1 px-3 rounded-full">기준: 2021~2025</span>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow border-l-4 border-rose-500 p-6">
+                <p class="text-sm text-gray-500 font-bold mb-1">2025년 한 해 폐교 수</p>
+                <div class="flex items-baseline gap-2">
+                    <h2 class="text-4xl font-extrabold text-gray-800">51<span class="text-lg font-medium text-gray-600">곳</span></h2>
+                    <span class="text-sm font-bold text-rose-500">▲ 역대 최다</span>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow border-l-4 border-orange-500 p-6">
+                <p class="text-sm text-gray-500 font-bold mb-1">최근 2년 증가율 (23년 대비 25년)</p>
+                <div class="flex items-baseline gap-2">
+                    <h2 class="text-4xl font-extrabold text-gray-800">131<span class="text-lg font-medium text-gray-600">%</span></h2>
+                    <span class="text-sm font-bold text-orange-500">▲ 급증</span>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow border-l-4 border-indigo-500 p-6">
+                <p class="text-sm text-gray-500 font-bold mb-1">2025년 최다 폐교 지역</p>
+                <div class="flex items-baseline gap-2">
+                    <h2 class="text-3xl font-extrabold text-gray-800">전남·강원</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">📈 최근 5년 전국 폐교 추이 (단위: 곳)</h3>
+                <div class="relative" style="height: 300px;">
+                    <canvas id="trendChart"></canvas>
+                </div>
+                <p class="text-xs text-gray-400 mt-4 text-center">2023년 이후 가파른 상승 곡선(J커브)을 보이고 있습니다.</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">📊 최근 3년(23~25) 주요 시도별 폐교 비교</h3>
+                <div class="relative" style="height: 300px;">
+                    <canvas id="regionalStackedChart"></canvas>
+                </div>
+                <p class="text-xs text-gray-400 mt-4 text-center">수도권(서울 등)에서도 폐교가 발생하기 시작했습니다.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. 전국 5년 추이 차트 (Line)
+        const ctxTrend = document.getElementById('trendChart').getContext('2d');
+        new Chart(ctxTrend, {
+            type: 'line',
+            data: {
+                labels: ['2021', '2022', '2023', '2024', '2025'],
+                datasets: [{
+                    label: '전국 폐교 수',
+                    data: [24, 25, 22, 33, 51], // 실제 통계치 반영
+                    borderColor: 'rgb(225, 29, 72)', // 로즈(빨강)
+                    backgroundColor: 'rgba(225, 29, 72, 0.2)',
+                    borderWidth: 3,
+                    pointBackgroundColor: 'rgb(225, 29, 72)',
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, max: 60 }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // 2. 주요 시도별 최근 3년 비교 차트 (Stacked Bar)
+        // 화면에 잘 보이도록 폐교가 많은 상위 7개 지역 + 서울만 발췌
+        const ctxRegional = document.getElementById('regionalStackedChart').getContext('2d');
+        new Chart(ctxRegional, {
+            type: 'bar',
+            data: {
+                labels: ['전남', '강원', '경북', '충남', '전북', '경기', '부산', '서울'],
+                datasets: [
+                    {
+                        label: '2023년',
+                        data: [4, 3, 4, 2, 2, 1, 1, 0],
+                        backgroundColor: 'rgba(209, 213, 219, 0.7)' // 회색 (과거)
+                    },
+                    {
+                        label: '2024년',
+                        data: [6, 7, 5, 4, 3, 2, 3, 2],
+                        backgroundColor: 'rgba(251, 146, 60, 0.8)' // 주황색 (가속)
+                    },
+                    {
+                        label: '2025년',
+                        data: [10, 8, 5, 9, 8, 6, 2, 0], // 최신 데이터
+                        backgroundColor: 'rgba(225, 29, 72, 0.9)' // 빨간색 (현재 심각성)
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, beginAtZero: true }
+                },
+                plugins: {
+                    tooltip: { mode: 'index', intersect: false }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

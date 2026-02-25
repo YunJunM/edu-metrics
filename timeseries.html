@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주요 지표 시계열 추이</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+ <nav class="bg-blue-800 p-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center text-white">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded font-bold text-sm transition-colors">🏠 HOME</a>
+                <h1 class="text-xl font-bold tracking-tight hidden md:block">📊 교육 주요 지표 시계열 추이</h1>
+            </div>
+            <span class="text-xs md:text-sm bg-blue-900 border border-blue-500 py-1 px-3 rounded-full text-blue-200 shadow-sm">
+                출처: KEDI 교육통계 연보 및 지방교육재정알리미
+            </span>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-10 max-w-5xl">
+        <div class="mb-8">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-2">거시적 교육 지표 변화</h2>
+            <p class="text-gray-500">학령인구 및 교육재정의 최근 5년간 흐름을 파악합니다.</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8 hover:shadow-md transition-shadow">
+            <h3 class="text-lg font-bold mb-4 text-gray-800 border-b pb-2 flex justify-between">
+                <span>📉 초·중·고 학령인구 추이 (단위: 만 명)</span>
+            </h3>
+            <div class="relative h-72">
+                <canvas id="popChart"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+            <h3 class="text-lg font-bold mb-4 text-gray-800 border-b pb-2 flex justify-between">
+                <span>📈 지방교육재정교부금 추이 (단위: 조 원)</span>
+            </h3>
+            <div class="relative h-72">
+                <canvas id="financeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. 학령인구 차트 (Line Chart)
+        new Chart(document.getElementById('popChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['2022년', '2023년', '2024년', '2025년', '2026년(예상)'],
+                datasets: [{
+                    label: '학령인구 (만 명)',
+                    data: [528, 520, 513, 495, 480],
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
+                    pointBackgroundColor: 'rgb(59, 130, 246)',
+                    pointRadius: 6,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // 2. 교육재정 차트 (Bar Chart)
+        new Chart(document.getElementById('financeChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['2022년', '2023년', '2024년', '2025년', '2026년(본예산)'],
+                datasets: [{
+                    label: '지방교육재정교부금 (조 원)',
+                    data: [81.3, 75.7, 68.9, 72.3, 70.5],
+                    backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                    borderRadius: 6,
+                    barPercentage: 0.6
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    </script>
+</body>
+</html>
