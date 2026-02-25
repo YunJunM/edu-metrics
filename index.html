@@ -99,7 +99,45 @@
             </a>
         </div>
     </div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <h3 class="text-lg font-bold text-indigo-900 mb-4">🌍 세계교육정책 트렌드 (2026.02)</h3>
+        <canvas id="worldEduChart" width="400" height="200"></canvas>
+        <p class="mt-4 text-sm text-gray-600 italic border-l-4 border-indigo-500 pl-3">
+            "에스토니아의 AI 교사 지원 시스템은 우리나라 교사 업무 경감 정책에 중요한 모델이 됩니다." - 김진희 분석
+        </p>
+    </div>
 
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <h3 class="text-lg font-bold text-indigo-900 mb-4">🔍 이달의 교육 현안 키워드</h3>
+        <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold">#AI 질문법</span>
+            <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">#교실 회복</span>
+            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">#에스토니아 모델</span>
+            <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">#거버넌스 혁신</span>
+        </div>
+        <div class="mt-6">
+            <a href="https://edpolicy.kedi.re.kr/frt/boardList.do?strCurMenuId=10091" target="_blank" class="text-indigo-600 font-bold hover:underline">원문 보고서 바로가기 →</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // 샘플 차트 데이터 (발간물 수치 기준 가공)
+    const ctx = document.getElementById('worldEduChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['에스토니아', '스웨덴', '네덜란드', '한국'],
+            datasets: [{
+                label: '디지털 교육 도입 지수',
+                data: [92, 85, 88, 78],
+                backgroundColor: '#6366f1'
+            }]
+        }
+    });
+</script>
     <script>
         const newsData = [
             {
@@ -150,3 +188,4 @@
 </body>
 
 </html>
+
