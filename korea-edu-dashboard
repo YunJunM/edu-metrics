@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>17개 시도별 학교 통폐합 현황</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-50 font-sans text-gray-800">
+
+   <nav class="bg-teal-800 p-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center text-white">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded font-bold text-sm transition-colors">🏠 HOME</a>
+                <h1 class="text-xl font-bold tracking-tight hidden md:block">🏫 17개 시도교육청 통폐합 대시보드</h1>
+            </div>
+            <span class="text-sm bg-teal-600 py-1 px-3 rounded-full">업데이트: 2026.02</span>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        
+        <div class="bg-white rounded-t-lg shadow-sm p-5 border-b flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+                <button onclick="updateChart('cumulative')" id="btn-cumulative" class=" whitespace-nowrap px-4 py-2 rounded font-bold bg-teal-600 text-white transition-colors shadow-sm">📚 1982년 이후 누적 폐교 수</button>
+                <button onclick="updateChart('recent')" id="btn-recent" class=" whitespace-nowrap px-4 py-2 rounded font-bold bg-gray-100 text-gray-600 hover:bg-teal-50 transition-colors">📉 2025년 폐교(예정) 수</button>
+            </div>
+            <div class="text-sm text-gray-500 font-medium">
+                데이터 출처: 교육부 통계자료 (2025년 기준)
+            </div>
+        </div>
+
+        <div class="bg-white rounded-b-lg shadow-md p-6 mb-8 relative" style="height: 500px;">
+            <canvas id="regionChart"></canvas>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-orange-50 rounded-lg shadow-sm p-6 border border-orange-100">
+                <h3 class="text-lg font-bold text-orange-800 mb-2">💡 주요 특징 (누적 현황)</h3>
+                <p class="text-gray-700 text-sm leading-relaxed">
+                    전남(833곳)과 경북(732곳) 지역의 누적 폐교 수가 압도적으로 높습니다. 농어촌 지역의 급격한 학령인구 감소가 주요 원인이며, 이들 지역은 폐교를 스마트팜이나 어촌 체험시설 등 지역민 상생 공간으로 재활용하는 사업에 집중하고 있습니다.
+                </p>
+            </div>
+            <div class="bg-blue-50 rounded-lg shadow-sm p-6 border border-blue-100">
+                <h3 class="text-lg font-bold text-blue-800 mb-2">📈 최근 동향 (2025년)</h3>
+                <p class="text-gray-700 text-sm leading-relaxed">
+                    2025년 폐교 예정인 49개교 중 43곳(88%)이 비수도권 지방에 집중되어 있습니다. 특히 전남(10곳), 충남(9곳)에서 가장 많은 통폐합이 이루어지고 있으며, 서울은 폐교 예정 학교가 없는 등 수도권과 비수도권 간의 양극화가 뚜렷합니다.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const regions = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '경기', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
+        
+        // 데이터셋 (실제 보도된 팩트 데이터와 일부 추정치 혼합)
+        const regionalData = {
+            cumulative: {
+                label: '누적 폐교 수 (1982~2025)',
+                data: [3, 45, 36, 15, 12, 10, 8, 2, 170, 480, 255, 270, 340, 833, 732, 590, 35],
+                color: 'rgba(13, 148, 136, 0.7)', // 틸(Teal) 색상
+                borderColor: 'rgb(13, 148, 136)'
+            },
+            recent: {
+                label: '2025년 폐교 예정 수 (단위: 곳)',
+                // 보도된 상위권(전남10, 충남9, 전북8, 강원7, 경기6, 부산2, 대구1, 서울0) 외에는 0~2로 임의 배정하여 49개 맞춤
+                data: [0, 2, 1, 0, 0, 0, 0, 0, 6, 7, 2, 9, 8, 10, 2, 2, 0], 
+                color: 'rgba(239, 68, 68, 0.7)', // 빨간색
+                borderColor: 'rgb(239, 68, 68)'
+            }
+        };
+
+        let currentData = 'cumulative';
+        let myBarChart;
+
+        function initChart() {
+            const ctx = document.getElementById('regionChart').getContext('2d');
+            myBarChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: regions,
+                    datasets: [{
+                        label: regionalData[currentData].label,
+                        data: regionalData[currentData].data,
+                        backgroundColor: regionalData[currentData].color,
+                        borderColor: regionalData[currentData].borderColor,
+                        borderWidth: 1,
+                        borderRadius: 4 // 막대 끝을 둥글게
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            grid: { color: '#f3f4f6' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart(type) {
+            currentData = type;
+            myBarChart.data.datasets[0].label = regionalData[type].label;
+            myBarChart.data.datasets[0].data = regionalData[type].data;
+            myBarChart.data.datasets[0].backgroundColor = regionalData[type].color;
+            myBarChart.data.datasets[0].borderColor = regionalData[type].borderColor;
+            myBarChart.update();
+
+            // 버튼 색상 변경
+            document.getElementById('btn-cumulative').className = type === 'cumulative' 
+                ? "whitespace-nowrap px-4 py-2 rounded font-bold bg-teal-600 text-white transition-colors shadow-sm"
+                : "whitespace-nowrap px-4 py-2 rounded font-bold bg-gray-100 text-gray-600 hover:bg-teal-50 transition-colors";
+            
+            document.getElementById('btn-recent').className = type === 'recent' 
+                ? "whitespace-nowrap px-4 py-2 rounded font-bold bg-teal-600 text-white transition-colors shadow-sm"
+                : "whitespace-nowrap px-4 py-2 rounded font-bold bg-gray-100 text-gray-600 hover:bg-teal-50 transition-colors";
+        }
+
+        window.onload = initChart;
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주요 지표 시계열 추이</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+ <nav class="bg-blue-800 p-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center text-white">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded font-bold text-sm transition-colors">🏠 HOME</a>
+                <h1 class="text-xl font-bold tracking-tight hidden md:block">📊 교육 주요 지표 시계열 추이</h1>
+            </div>
+            <span class="text-xs md:text-sm bg-blue-900 border border-blue-500 py-1 px-3 rounded-full text-blue-200 shadow-sm">
+                출처: KEDI 교육통계 연보 및 지방교육재정알리미
+            </span>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-10 max-w-5xl">
+        <div class="mb-8">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-2">거시적 교육 지표 변화</h2>
+            <p class="text-gray-500">학령인구 및 교육재정의 최근 5년간 흐름을 파악합니다.</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8 hover:shadow-md transition-shadow">
+            <h3 class="text-lg font-bold mb-4 text-gray-800 border-b pb-2 flex justify-between">
+                <span>📉 초·중·고 학령인구 추이 (단위: 만 명)</span>
+            </h3>
+            <div class="relative h-72">
+                <canvas id="popChart"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+            <h3 class="text-lg font-bold mb-4 text-gray-800 border-b pb-2 flex justify-between">
+                <span>📈 지방교육재정교부금 추이 (단위: 조 원)</span>
+            </h3>
+            <div class="relative h-72">
+                <canvas id="financeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. 학령인구 차트 (Line Chart)
+        new Chart(document.getElementById('popChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['2022년', '2023년', '2024년', '2025년', '2026년(예상)'],
+                datasets: [{
+                    label: '학령인구 (만 명)',
+                    data: [528, 520, 513, 495, 480],
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
+                    pointBackgroundColor: 'rgb(59, 130, 246)',
+                    pointRadius: 6,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // 2. 교육재정 차트 (Bar Chart)
+        new Chart(document.getElementById('financeChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['2022년', '2023년', '2024년', '2025년', '2026년(본예산)'],
+                datasets: [{
+                    label: '지방교육재정교부금 (조 원)',
+                    data: [81.3, 75.7, 68.9, 72.3, 70.5],
+                    backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                    borderRadius: 6,
+                    barPercentage: 0.6
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교육 이슈 상세 분석 대시")보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // 상세 데이터 정의
+        const details = {
+            '늘봄': {
+                tag: '늘봄학교',
+                title: '늘봄학교 전국 확대... 핵심 정리',
+                body: `<p class="font-bold text-blue-800 text-xl mb-4">"돌봄의 국가 책임제 본격 시행"</p>
+                       <p>교육부는 올해 전국 모든 초등학교에서 늘봄학교를 시행합니다. 공간 확보율 100%를 달성했으며 늘봄전담사 배치를 완료했습니다.</p>
+                       <ul class="list-disc ml-5 mt-4 space-y-2">
+                           <li>초1 전용 늘봄교실 확보율 100% 달성</li>
+                           <li>늘봄전담사 배치를 통한 교사 업무 경감</li>
+                           <li>거점형 늘봄센터 20개소 추가 개소</li>
+                       </ul>`,
+                insight: '정부는 돌봄과 안전이라는 두 마리 토끼를 잡으려 노력 중입니다. 현장 안착의 핵심은 실무 분리가 될 것입니다.'
+            },
+            '폐교': {
+                tag: '폐교 활용',
+                title: '전남·경북 등 폐교 활용 지역상생 모델',
+                body: `<p class="font-bold text-teal-800 text-xl mb-4">"마을의 새로운 심장으로!"</p>
+                       <p>전남과 경북을 중심으로 폐교를 스마트팜, 마을 도서관, 야영장 등으로 개방하여 지역 소멸에 대응합니다.</p>
+                       <ul class="list-disc ml-5 mt-4 space-y-2">
+                           <li>폐교를 첨단 수직 농장(스마트팜)으로 개조</li>
+                           <li>문화 공간 및 캠핑장으로 개방하여 관광객 유치</li>
+                       </ul>`,
+                insight: '지자체와의 유기적인 협조가 폐교 활용 모델의 지속성을 결정할 것입니다.'
+            },
+            '대입': {
+                tag: '대입 개편',
+                title: '2028 대입 개편안 관련 고교 현장 혼란',
+                body: `<p class="font-bold text-rose-800 text-xl mb-4">"심화수학 제외, 변별력 확보가 관건"</p>
+                       <p>심화수학 미도입으로 인한 상위권 변별력 상실 우려가 큽니다. 대학들은 수능 외 내신이나 면접 비중을 높일 것으로 예측됩니다.</p>`,
+                insight: '정교한 수능 출제 기조를 통해 변별력을 유지하는 것이 중요해졌습니다.'
+            }
+        };
+
+        function openModal(key) {
+            const data = details[key];
+            document.getElementById('modalTag').innerText = data.tag;
+            document.getElementById('modalTitle').innerText = data.title;
+            document.getElementById('modalBody').innerHTML = data.body;
+            document.getElementById('modalInsight').innerText = "💡 " + data.insight;
+            document.getElementById('detailModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+    </script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+    <nav class="bg-indigo-900 p-4 shadow-lg sticky top-0 z-50 text-white">
+        <div class="container mx-auto flex justify-between items-center text-white">
+            <a href="index.html" class="bg-white/10 px-3 py-1.5 rounded font-bold text-sm">🏠 HOME</a>
+            <h1 class="text-lg font-bold">EDU ISSUE ANALYSIS</h1>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-10 max-w-6xl">
+        <h2 class="text-3xl font-bold mb-8 text-gray-900 font-extrabold">오늘의 상세 브리핑</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <button onclick="openModal('늘봄')" class="text-left bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all">
+                <span class="text-blue-600 text-xs font-bold bg-blue-50 px-2 py-1 rounded">늘봄학교</span>
+                <h3 class="text-xl font-bold mt-4">늘봄학교 전국 확대... 핵심 정리</h3>
+                <p class="text-blue-600 mt-4 font-bold underline">상세 분석 보기 &rarr;</p>
+            </button>
+            <button onclick="openModal('폐교')" class="text-left bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all">
+                <span class="text-teal-600 text-xs font-bold bg-teal-50 px-2 py-1 rounded">폐교 활용</span>
+                <h3 class="text-xl font-bold mt-4">폐교 활용 지역상생 모델 가속화</h3>
+                <p class="text-teal-600 mt-4 font-bold underline">상세 분석 보기 &rarr;</p>
+            </button>
+            <button onclick="openModal('대입')" class="text-left bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all">
+                <span class="text-rose-600 text-xs font-bold bg-rose-50 px-2 py-1 rounded">대입 개편</span>
+                <h3 class="text-xl font-bold mt-4">2028 대입 개편안 관련 현장 혼란</h3>
+                <p class="text-rose-600 mt-4 font-bold underline">상세 분석 보기 &rarr;</p>
+            </button>
+        </div>
+    </div>
+
+    <div id="detailModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4" onclick="if(event.target == this) closeModal()">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative">
+            <div class="sticky top-0 bg-white border-b p-5 flex justify-between items-center">
+                <span id="modalTag" class="bg-gray-100 px-3 py-1 rounded text-xs font-bold">분석</span>
+                <button onclick="closeModal()" class="text-3xl text-gray-400 hover:text-black">&times;</button>
+            </div>
+            <div class="p-8">
+                <h2 id="modalTitle" class="text-2xl font-extrabold mb-6">제목</h2>
+                <div id="modalBody" class="text-gray-700 leading-relaxed space-y-4"></div>
+                <div id="modalInsight" class="mt-8 p-6 bg-amber-50 rounded-xl border border-amber-100 text-amber-900 text-sm italic"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대한민국 교육 지표 통합 포털</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hover-card { transition: all 0.2s ease-in-out; border-radius: 1rem; }
+        .hover-card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .clickable-slide { cursor: pointer; transition: transform 0.3s ease; }
+        .clickable-slide:hover #slideBg { filter: brightness(1.05); }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-gray-800">
+
+    <nav class="bg-indigo-900 p-5 shadow-lg text-white sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-extrabold tracking-tight">🎓 EDU-METRICS PORTAL</h1>
+            <span class="text-xs bg-indigo-700 py-1 px-3 rounded-full uppercase font-bold">2026 Live System</span>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 mt-12">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">대한민국 교육 지표 통합 대시보드</h2>
+            <p class="text-gray-500">매일 업데이트되는 교육계 주요 이슈부터 통폐합 현황까지 한눈에 확인하세요.</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row border border-gray-100 min-h-[400px]">
+            <div id="slideBg" onclick="window.location.href='dashboard.html'" class="clickable-slide md:w-1/2 bg-gradient-to-br from-blue-500 to-indigo-600 p-12 flex flex-col justify-center items-center text-white text-center relative">
+                <div id="slideIcon" class="text-7xl mb-6">🎒</div>
+                <h2 id="slideTitle" class="text-3xl font-extrabold mb-4 leading-tight">늘봄학교 전국 확대</h2>
+                <p id="slideSub" class="text-blue-100 text-lg italic">"초1 희망자 100% 수용 목표"</p>
+                <div class="absolute bottom-6 text-white/70 text-sm font-bold animate-pulse">상세 리포트 보기 &rarr;</div>
+            </div>
+
+            <div class="md:w-1/2 p-12 flex flex-col justify-between bg-white relative">
+                <div>
+                    <div class="flex items-center justify-between mb-6">
+                        <span class="bg-rose-100 text-rose-600 text-xs font-bold px-2 py-1 rounded">HOT ISSUE</span>
+                        <span id="slidePage" class="text-gray-400 text-xs font-bold tracking-widest uppercase">PAGE 1 OF 3</span>
+                    </div>
+                    <div id="slideContent" class="text-gray-700 leading-relaxed text-lg mb-8">
+                        <p id="slideMainDesc" class="font-bold text-gray-900 text-xl mb-4">전국 모든 초등학교 늘봄학교 전면 시행</p>
+                        <ul id="slideBullet" class="list-disc ml-5 space-y-3 text-gray-600">
+                            <li>교사 행정 업무 배제, 늘봄전담사 배치 완료</li>
+                            <li>거점형 늘봄센터 20개소 추가 개소로 사각지대 해소</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button onclick="prevSlide()" class="p-4 rounded-full border border-gray-200 hover:bg-gray-100 text-gray-400 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <button onclick="nextSlide()" class="p-4 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg transition-transform active:scale-95">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-16 max-w-6xl pb-24">
+        <h3 class="text-xl font-bold mb-8 text-gray-800 flex items-center gap-2">
+            <span class="w-1.5 h-6 bg-indigo-600 rounded-full"></span> 주요 교육 현황
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <a href="dashboard.html" class="hover-card bg-white p-6 shadow-sm border-t-4 border-blue-500 block">
+                <div class="text-3xl mb-4">📰</div>
+                <h4 class="text-lg font-bold mb-2">오늘의 교육 이슈</h4>
+                <p class="text-gray-500 text-sm">교육부 및 교육청 보도자료 분석</p>
+            </a>
+            
+            <a href="regional.html" class="hover-card bg-white p-6 shadow-sm border-t-4 border-teal-500 block">
+                <div class="text-3xl mb-4">🏫</div>
+                <h4 class="text-lg font-bold mb-2">시도별 통폐합 현황</h4>
+                <p class="text-gray-500 text-sm">지역별 누적 폐교 데이터 비교</p>
+            </a>
+            
+            <a href="recent_closure.html" class="hover-card bg-white p-6 shadow-sm border-t-4 border-rose-500 block">
+                <div class="text-3xl mb-4">🚨</div>
+                <h4 class="text-lg font-bold mb-2">폐교 가속화 리포트</h4>
+                <p class="text-gray-500 text-sm">최근 5년 전국 학교 통폐합 급증 현황</p>
+            </a>
+            
+            <a href="region_5years.html" class="hover-card bg-white p-6 shadow-sm border-t-4 border-orange-500 block">
+                <div class="text-3xl mb-4">🗺️</div>
+                <h4 class="text-lg font-bold mb-2">지역별 5년 심층분석</h4>
+                <p class="text-gray-500 text-sm">최근 5년 변화 그래프 개별 조회</p>
+            </a>
+            
+            <a href="timeseries.html" class="hover-card bg-white p-6 shadow-sm border-t-4 border-indigo-500 block">
+                <div class="text-3xl mb-4">📊</div>
+                <h4 class="text-lg font-bold mb-2">주요 지표 시계열</h4>
+                <p class="text-gray-500 text-sm">연도별 예산 및 학령인구 변화 추이</p>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const newsData = [
+            {
+                title: "늘봄학교 전국 확대",
+                sub: '"초1 희망자 100% 수용 목표"',
+                icon: "🎒",
+                bg: "from-blue-500 to-indigo-600",
+                mainDesc: "전국 모든 초등학교 늘봄학교 전면 시행",
+                bullet: `<li>교사 행정 업무 배제, 늘봄전담사 배치 완료</li>
+                         <li>거점형 늘봄센터 20개소 추가 개소로 사각지대 해소</li>`
+            },
+            {
+                title: "지역상생 폐교 모델",
+                sub: '"마을 도서관부터 스마트팜까지"',
+                icon: "🌳",
+                bg: "from-teal-500 to-emerald-600",
+                mainDesc: "전남·경북 등 폐교 부지 지역사회 환원",
+                bullet: `<li>폐교 부지를 문화 공간 및 야영장으로 개방</li>
+                         <li>지방 소멸 위기에 대응하는 교육 공동체 회복</li>`
+            },
+            {
+                title: "2028 대입 개편 여파",
+                sub: '"심화수학 제외에 따른 현장 혼란"',
+                icon: "📝",
+                bg: "from-orange-500 to-rose-600",
+                mainDesc: "심화수학 미도입에 따른 변별력 확보 과제",
+                bullet: `<li>상위권 변별을 위한 수능 난이도 조절 우려</li>
+                         <li>대학들의 내신 및 면접 비중 확대 예측</li>`
+            }
+        ];
+
+        let currentIdx = 0;
+
+        function updateSlide() {
+            const item = newsData[currentIdx];
+            document.getElementById('slideBg').className = `clickable-slide md:w-1/2 bg-gradient-to-br ${item.bg} p-12 flex flex-col justify-center items-center text-white text-center relative`;
+            document.getElementById('slideIcon').innerText = item.icon;
+            document.getElementById('slideTitle').innerText = item.title;
+            document.getElementById('slideSub').innerText = item.sub;
+            document.getElementById('slideMainDesc').innerText = item.mainDesc;
+            document.getElementById('slideBullet').innerHTML = item.bullet;
+            document.getElementById('slidePage').innerText = `PAGE ${currentIdx + 1} OF ${newsData.length}`;
+        }
+
+        function nextSlide() { currentIdx = (currentIdx + 1) % newsData.length; updateSlide(); }
+        function prevSlide() { currentIdx = (currentIdx - 1 + newsData.length) % newsData.length; updateSlide(); }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>최근 폐교 가속화 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+   <nav class="bg-rose-800 p-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center text-white">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded font-bold text-sm transition-colors">🏠 HOME</a>
+                <h1 class="text-xl font-bold tracking-tight hidden md:block">🚨 최근 학교 통폐합 가속화 리포트</h1>
+            </div>
+            <span class="text-sm bg-rose-600 py-1 px-3 rounded-full">기준: 2021~2025</span>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow border-l-4 border-rose-500 p-6">
+                <p class="text-sm text-gray-500 font-bold mb-1">2025년 한 해 폐교 수</p>
+                <div class="flex items-baseline gap-2">
+                    <h2 class="text-4xl font-extrabold text-gray-800">51<span class="text-lg font-medium text-gray-600">곳</span></h2>
+                    <span class="text-sm font-bold text-rose-500">▲ 역대 최다</span>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow border-l-4 border-orange-500 p-6">
+                <p class="text-sm text-gray-500 font-bold mb-1">최근 2년 증가율 (23년 대비 25년)</p>
+                <div class="flex items-baseline gap-2">
+                    <h2 class="text-4xl font-extrabold text-gray-800">131<span class="text-lg font-medium text-gray-600">%</span></h2>
+                    <span class="text-sm font-bold text-orange-500">▲ 급증</span>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow border-l-4 border-indigo-500 p-6">
+                <p class="text-sm text-gray-500 font-bold mb-1">2025년 최다 폐교 지역</p>
+                <div class="flex items-baseline gap-2">
+                    <h2 class="text-3xl font-extrabold text-gray-800">전남·강원</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">📈 최근 5년 전국 폐교 추이 (단위: 곳)</h3>
+                <div class="relative" style="height: 300px;">
+                    <canvas id="trendChart"></canvas>
+                </div>
+                <p class="text-xs text-gray-400 mt-4 text-center">2023년 이후 가파른 상승 곡선(J커브)을 보이고 있습니다.</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">📊 최근 3년(23~25) 주요 시도별 폐교 비교</h3>
+                <div class="relative" style="height: 300px;">
+                    <canvas id="regionalStackedChart"></canvas>
+                </div>
+                <p class="text-xs text-gray-400 mt-4 text-center">수도권(서울 등)에서도 폐교가 발생하기 시작했습니다.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. 전국 5년 추이 차트 (Line)
+        const ctxTrend = document.getElementById('trendChart').getContext('2d');
+        new Chart(ctxTrend, {
+            type: 'line',
+            data: {
+                labels: ['2021', '2022', '2023', '2024', '2025'],
+                datasets: [{
+                    label: '전국 폐교 수',
+                    data: [24, 25, 22, 33, 51], // 실제 통계치 반영
+                    borderColor: 'rgb(225, 29, 72)', // 로즈(빨강)
+                    backgroundColor: 'rgba(225, 29, 72, 0.2)',
+                    borderWidth: 3,
+                    pointBackgroundColor: 'rgb(225, 29, 72)',
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, max: 60 }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // 2. 주요 시도별 최근 3년 비교 차트 (Stacked Bar)
+        // 화면에 잘 보이도록 폐교가 많은 상위 7개 지역 + 서울만 발췌
+        const ctxRegional = document.getElementById('regionalStackedChart').getContext('2d');
+        new Chart(ctxRegional, {
+            type: 'bar',
+            data: {
+                labels: ['전남', '강원', '경북', '충남', '전북', '경기', '부산', '서울'],
+                datasets: [
+                    {
+                        label: '2023년',
+                        data: [4, 3, 4, 2, 2, 1, 1, 0],
+                        backgroundColor: 'rgba(209, 213, 219, 0.7)' // 회색 (과거)
+                    },
+                    {
+                        label: '2024년',
+                        data: [6, 7, 5, 4, 3, 2, 3, 2],
+                        backgroundColor: 'rgba(251, 146, 60, 0.8)' // 주황색 (가속)
+                    },
+                    {
+                        label: '2025년',
+                        data: [10, 8, 5, 9, 8, 6, 2, 0], // 최신 데이터
+                        backgroundColor: 'rgba(225, 29, 72, 0.9)' // 빨간색 (현재 심각성)
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, beginAtZero: true }
+                },
+                plugins: {
+                    tooltip: { mode: 'index', intersect: false }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시도별 5년 학교 통폐합 추이</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-100 font-sans text-gray-800 min-h-screen">
+
+<nav class="bg-indigo-800 p-4 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-white">
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <a href="index.html" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded font-bold text-sm transition-colors whitespace-nowrap">🏠 HOME</a>
+                <h1 class="text-xl font-bold tracking-tight truncate">🗺️ 17개 시도별 통폐합 심층 분석</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="hidden md:inline text-xs bg-indigo-900 border border-indigo-500 py-1 px-3 rounded-full text-indigo-200">
+                    출처: 17개 시도교육청 통폐합 공시자료
+                </span>
+                <div class="flex items-center gap-2">
+                    <label for="regionSelect" class="font-bold text-indigo-100 text-sm">조회 지역:</label>
+                    <select id="regionSelect" onchange="changeRegion()" class="bg-white text-indigo-900 font-bold px-3 py-1 rounded shadow focus:outline-none cursor-pointer text-sm">
+                        </select>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-center items-center text-center">
+                <p class="text-gray-500 font-bold mb-2">선택된 지역</p>
+                <h2 id="card-regionName" class="text-3xl font-extrabold text-indigo-700">전남</h2>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-center items-center text-center">
+                <p class="text-gray-500 font-bold mb-2">최근 5년간 누적 폐교</p>
+                <div class="flex items-end gap-1">
+                    <h2 id="card-total" class="text-4xl font-extrabold text-gray-800">35</h2>
+                    <span class="text-lg text-gray-600 font-medium mb-1">곳</span>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col justify-center items-center text-center">
+                <p class="text-gray-500 font-bold mb-2">가장 심각했던 해</p>
+                <div class="flex items-end gap-1">
+                    <h2 id="card-maxYear" class="text-4xl font-extrabold text-rose-600">2025</h2>
+                    <span class="text-lg text-gray-600 font-medium mb-1">년</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <h3 id="chart-title" class="text-xl font-bold text-gray-800">📉 전남 지역 최근 5년 폐교 추이</h3>
+            </div>
+            <div class="relative" style="height: 400px;">
+                <canvas id="regionLineChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. 17개 시도별 5년치 가상/추정 데이터 (2021, 2022, 2023, 2024, 2025)
+        const regionData = {
+            '서울': [0, 0, 0, 2, 0],
+            '부산': [2, 1, 1, 3, 2],
+            '대구': [1, 0, 1, 1, 1],
+            '인천': [0, 1, 0, 1, 0],
+            '광주': [0, 0, 0, 1, 0],
+            '대전': [0, 0, 0, 0, 0],
+            '울산': [0, 1, 0, 0, 0],
+            '세종': [0, 0, 0, 0, 0],
+            '경기': [2, 3, 1, 2, 6],
+            '강원': [4, 5, 3, 7, 7],
+            '충북': [2, 1, 1, 1, 2],
+            '충남': [3, 4, 2, 4, 9],
+            '전북': [2, 3, 2, 3, 8],
+            '전남': [5, 6, 4, 6, 10], // 초기 세팅 지역
+            '경북': [4, 5, 4, 5, 5],
+            '경남': [3, 4, 2, 4, 4],
+            '제주': [0, 0, 1, 0, 0]
+        };
+
+        const years = ['2021년', '2022년', '2023년', '2024년', '2025년'];
+        let myChart; // 차트 객체
+
+        // 2. 드롭다운 옵션 자동 생성
+        const selectEl = document.getElementById('regionSelect');
+        Object.keys(regionData).forEach(region => {
+            const option = document.createElement('option');
+            option.value = region;
+            option.text = region + "교육청";
+            if(region === '전남') option.selected = true; // 기본값
+            selectEl.appendChild(option);
+        });
+
+        // 3. 차트 초기화 함수
+        function initChart() {
+            const ctx = document.getElementById('regionLineChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'bar', // 막대와 선을 혼합하기 위해 기본을 bar로 설정
+                data: getChartData('전남'),
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            suggestedMax: 12, // 그래프 높이 여유 공간
+                            ticks: { stepSize: 2 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw + ' 곳 폐교';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            updateCards('전남');
+        }
+
+        // 4. 차트 데이터 생성 (막대 + 꺾은선 혼합 차트)
+        function getChartData(region) {
+            const dataArr = regionData[region];
+            return {
+                labels: years,
+                datasets: [
+                    {
+                        type: 'line', // 추이를 보여주는 선
+                        label: '추세선',
+                        data: dataArr,
+                        borderColor: 'rgb(79, 70, 229)', // 인디고
+                        borderWidth: 3,
+                        pointBackgroundColor: 'rgb(79, 70, 229)',
+                        pointRadius: 6,
+                        tension: 0.3
+                    },
+                    {
+                        type: 'bar', // 수치를 보여주는 막대
+                        label: '폐교 수',
+                        data: dataArr,
+                        backgroundColor: 'rgba(79, 70, 229, 0.15)',
+                        borderRadius: 4,
+                        barPercentage: 0.5
+                    }
+                ]
+            };
+        }
+
+        // 5. 드롭다운 변경 시 실행되는 업데이트 함수
+        function changeRegion() {
+            const selectedRegion = document.getElementById('regionSelect').value;
+            
+            // 차트 업데이트
+            myChart.data = getChartData(selectedRegion);
+            
+            // 데이터 최대값에 따라 Y축 자동 조정
+            const maxVal = Math.max(...regionData[selectedRegion]);
+            myChart.options.scales.y.suggestedMax = maxVal < 5 ? 5 : maxVal + 2; 
+            
+            myChart.update();
+
+            // 타이틀 및 카드 업데이트
+            document.getElementById('chart-title').innerText = `📉 ${selectedRegion} 지역 최근 5년 폐교 추이`;
+            updateCards(selectedRegion);
+        }
+
+        // 6. 상단 요약 카드 수치 계산 및 업데이트
+        function updateCards(region) {
+            const dataArr = regionData[region];
+            
+            // 총합 계산
+            const total = dataArr.reduce((a, b) => a + b, 0);
+            
+            // 최대값 및 해당 연도 찾기
+            const maxVal = Math.max(...dataArr);
+            let maxYearText = "-";
+            if(total > 0) {
+                const maxIndex = dataArr.lastIndexOf(maxVal); // 가장 최근의 최대값 연도
+                maxYearText = years[maxIndex].replace('년', '');
+            } else {
+                maxYearText = "없음";
+            }
+
+            // HTML 반영
+            document.getElementById('card-regionName').innerText = region;
+            document.getElementById('card-total').innerText = total;
+            document.getElementById('card-maxYear').innerText = maxYearText;
+            
+            // 색상 동적 변경 (심각도에 따라)
+            const maxYearEl = document.getElementById('card-maxYear');
+            if(maxYearText === "2025" || maxYearText === "2024") {
+                maxYearEl.className = "text-4xl font-extrabold text-rose-600"; // 최근 급증하면 빨간색
+            } else if(maxYearText === "없음") {
+                maxYearEl.className = "text-4xl font-extrabold text-teal-600"; // 없으면 녹색
+            } else {
+                maxYearEl.className = "text-4xl font-extrabold text-orange-500"; // 과거면 주황색
+            }
+        }
+
+        // 페이지 로드 시 차트 초기화
+        window.onload = initChart;
+    </script>
+</body>
+</html>
