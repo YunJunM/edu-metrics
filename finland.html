@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>핀란드 학교 네트워크 재편 현황</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/prop-types/prop-types.min.js"></script>
+    <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        .hover-card { transition: all 0.3s ease; }
+        .hover-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Recharts 전역 객체 안전하게 가져오기
+        const { 
+            AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
+        } = window.Recharts;
+
+        // 아이콘 컴포넌트들
+        const IconTrendingDown = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>;
+        const IconSchool = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2v-5"></path></svg>;
+        const IconHistory = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>;
+        const IconArrowDownRight = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="7" y1="7" x2="17" y2="17"></line><polyline points="17 7 17 17 7 17"></polyline></svg>;
+
+        const App = () => {
+            const data = [
+                { year: '1990', count: 4850 },
+                { year: '2000', count: 3800 },
+                { year: '2010', count: 2733 },
+                { year: '2014', count: 2500 },
+                { year: '2024', count: 1974 }
+            ];
+
+            const stats = [
+                { title: "1990-2010 폐교", value: "2,117", unit: "개교", trend: "65% 급감", color: "text-red-600", bg: "bg-red-50", icon: <IconTrendingDown /> },
+                { title: "연평균 폐교 수", value: "80", unit: "개교", trend: "집중 재편기", color: "text-orange-600", bg: "bg-orange-50", icon: <IconHistory /> },
+                { title: "현재 학교 수", value: "1,974", unit: "개교", trend: "2024년 기준", color: "text-blue-600", bg: "bg-blue-50", icon: <IconSchool /> },
+                { title: "최근 10년 감소", value: "21", unit: "%", trend: "추가 효율화", color: "text-purple-600", bg: "bg-purple-50", icon: <IconArrowDownRight /> }
+            ];
+
+            return (
+                <div className="p-4 md:p-12 max-w-6xl mx-auto">
+                    {/* 상단 헤더 */}
+                    <header className="mb-12">
+                        <span className="inline-block px-4 py-1.5 bg-indigo-600 text-white text-[11px] font-black rounded-full mb-6 tracking-widest shadow-lg shadow-indigo-100 uppercase">Finland Education Report</span>
+                        <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tighter leading-tight">핀란드 학교 네트워크<br/>구조조정 현황 리포트</h1>
+                        <p className="text-slate-500 max-w-2xl text-lg font-medium leading-relaxed">지난 30년간 핀란드 통계청 자료를 바탕으로 분석한 소규모 종합학교의 폐교 및 통합 추이 분석 대시보드입니다.</p>
+                    </header>
+
+                    {/* 카드 섹션 */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                        {stats.map((s, i) => (
+                            <div key={i} className="bg-white p-7 rounded-[2.5rem] border border-slate-100 hover-card cursor-default shadow-sm shadow-slate-200/50">
+                                <div className={`w-14 h-14 ${s.bg} ${s.color} rounded-2xl flex items-center justify-center mb-8`}>
+                                    {s.icon}
+                                </div>
+                                <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">{s.title}</p>
+                                <div className="flex items-baseline gap-1.5">
+                                    <span className="text-4xl font-black text-slate-900">{s.value}</span>
+                                    <span className="text-sm text-slate-400 font-bold">{s.unit}</span>
+                                </div>
+                                <div className={`mt-4 inline-block px-3 py-1 rounded-full text-[10px] font-black ${s.bg} ${s.color}`}>
+                                    {s.trend}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* 차트 & 리포트 섹션 */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                        <div className="lg:col-span-2 bg-white p-10 rounded-[3rem] border border-slate-100 shadow-sm shadow-slate-200/50">
+                            <div className="flex items-center justify-between mb-10">
+                                <h3 className="text-xl font-black text-slate-900 flex items-center gap-3 italic">
+                                    <span className="text-indigo-600"><IconTrendingDown /></span>
+                                    학교 수 변동 시각화 (1990-2024)
+                                </h3>
+                                <div className="flex gap-2">
+                                    <div className="w-3 h-3 bg-indigo-500 rounded-full animate-pulse"></div>
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Live Data Analysis</span>
+                                </div>
+                            </div>
+                            <div className="h-[380px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                                        <defs>
+                                            <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                                                <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="6 6" vertical={false} stroke="#f1f5f9" />
+                                        <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 13, fontWeight: 700}} dy={15} />
+                                        <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 13, fontWeight: 700}} />
+                                        <Tooltip 
+                                            contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', padding: '15px' }}
+                                            itemStyle={{ fontWeight: '900', color: '#1e293b' }}
+                                            labelStyle={{ fontWeight: '900', color: '#6366f1', marginBottom: '5px' }}
+                                            formatter={(v) => [`${v}개교`, '전체 학교 수']}
+                                        />
+                                        <Area type="monotone" dataKey="count" stroke="#6366f1" strokeWidth={5} fill="url(#grad)" animationDuration={2000} />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-900 text-white p-10 rounded-[3rem] shadow-2xl flex flex-col justify-between relative overflow-hidden">
+                            <div className="relative z-10">
+                                <h3 className="text-2xl font-black mb-10 tracking-tight">Policy Insights</h3>
+                                <div className="space-y-8">
+                                    <div className="border-l-4 border-indigo-500 pl-6 py-1">
+                                        <p className="text-[10px] text-indigo-400 font-black uppercase tracking-widest mb-2">Historical Factor</p>
+                                        <p className="text-sm text-slate-300 leading-relaxed font-medium">1990-2010년 사이 <strong>연평균 80개교가 폐교</strong>되었습니다. 이는 단순한 소멸이 아닌 국가 교육망의 거점화 과정이었습니다.</p>
+                                    </div>
+                                    <div className="border-l-4 border-purple-500 pl-6 py-1">
+                                        <p className="text-[10px] text-purple-400 font-black uppercase tracking-widest mb-2">Modern Strategy</p>
+                                        <p className="text-sm text-slate-300 leading-relaxed font-medium">최근 10년간 <strong>21% 감소세</strong>를 유지하며 시설 대형화와 전문 교사 그룹 배치를 통한 교육 질적 집중화를 추진 중입니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-12 p-7 bg-slate-800/50 rounded-[2rem] border border-white/10 backdrop-blur-sm z-10">
+                                <p className="text-[10px] text-slate-400 font-black mb-3 uppercase tracking-tighter italic">Expert Conclusion</p>
+                                <p className="text-sm text-white font-bold leading-relaxed">"핀란드의 폐교 전략은 지역 교육 생태계를 더 넓고 전문적으로 연결하는 '거점 네트워크화'의 핵심입니다."</p>
+                            </div>
+                            {/* 장식용 원형 배경 */}
+                            <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-indigo-600/20 rounded-full blur-3xl"></div>
+                        </div>
+                    </div>
+
+                    <footer className="text-center text-slate-400 text-[11px] font-black tracking-[0.2em] uppercase py-12 border-t border-slate-200">
+                        © 2026 Statistics Finland Analysis | Policy Governance Lab
+                    </footer>
+                </div>
+            );
+        };
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
+</body>
+</html>

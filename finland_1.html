@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>핀란드 교육 행정 개혁 리포트</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        .pillar-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .pillar-card:hover { transform: translateY(-8px); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+    <div class="min-h-screen p-4 md:p-12 max-w-6xl mx-auto">
+        <header class="mb-12 border-b border-slate-200 pb-10">
+            <div class="flex items-center gap-2 text-blue-600 font-bold mb-3">
+                <i data-lucide="globe" class="w-5 h-5"></i>
+                <span class="tracking-widest uppercase text-xs">Finland Administrative & Education Reform</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-black text-slate-800 mb-6 leading-tight">
+                교육·문화 중심(Sivistyskunta) <br class="hidden md:block">행정 단위로의 대전환
+            </h1>
+            <p class="text-lg md:text-xl text-slate-600 max-w-3xl leading-relaxed font-medium">
+                2023년 보건·복지 개혁 이후 핀란드 기초 지자체는 단순한 행정 단위를 넘어 
+                <strong class="text-blue-600"> '지역 학습 및 혁신 생태계의 허브'</strong>로 재위치되고 있습니다.
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 relative items-center">
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 flex flex-col items-center text-center">
+                <div class="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mb-5 text-slate-400">
+                    <i data-lucide="activity"></i>
+                </div>
+                <h3 class="font-bold text-slate-400 mb-2 uppercase tracking-tighter">과거 (복지 행정)</h3>
+                <p class="text-sm text-slate-500 italic">의료·사회복지 중심의 방대한 사무 담당</p>
+            </div>
+            
+            <div class="flex flex-col items-center justify-center">
+                <div class="bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-black animate-pulse shadow-xl shadow-blue-200 flex items-center gap-2">
+                    2023 국가 개혁 <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </div>
+
+            <div class="bg-blue-50 p-8 rounded-3xl shadow-sm border border-blue-200 flex flex-col items-center text-center ring-4 ring-blue-500/10">
+                <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center mb-5 text-blue-600">
+                    <i data-lucide="book-open"></i>
+                </div>
+                <h3 class="font-bold text-blue-700 mb-2 uppercase tracking-tighter">현재 (Sivistyskunta)</h3>
+                <p class="text-sm text-blue-600 font-black">교육·문화·혁신 생태계 집중</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+            <div class="pillar-card bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:border-blue-500 hover:shadow-2xl">
+                <div class="flex justify-between items-start mb-8">
+                    <div class="p-4 rounded-2xl bg-blue-50 text-blue-600">
+                        <i data-lucide="book-open"></i>
+                    </div>
+                    <span class="text-[10px] font-black px-3 py-1 rounded-full bg-blue-100 text-blue-700 uppercase tracking-widest">정체성 재정의</span>
+                </div>
+                <h2 class="text-xl font-black mb-4 text-slate-800 leading-snug">① 시비스틔스쿤타 전환</h2>
+                <p class="text-sm text-slate-500 mb-8 font-medium leading-relaxed">보건·복지 이관 후 '교육·교양 중심 자치단위'로의 근본적 기능 재편</p>
+                <ul class="space-y-5">
+                    <li class="flex gap-3 text-sm text-slate-700 leading-relaxed font-semibold">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 text-blue-500 shrink-0 mt-0.5"></i>
+                        <span>의료·사회복지 서비스를 21개 웰빙 카운티로 이관</span>
+                    </li>
+                    <li class="flex gap-3 text-sm text-slate-700 leading-relaxed font-semibold">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 text-blue-500 shrink-0 mt-0.5"></i>
+                        <span>기초 지자체: 아동 보육, 교육 등 인적 자본 축적에 집중</span>
+                    </li>
+                    <li class="flex gap-3 text-sm text-slate-700 leading-relaxed font-semibold">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 text-blue-500 shrink-0 mt-0.5"></i>
+                        <span>교육·문화 지출 비중 확대로 인한 행정 중심축 이동</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="pillar-card bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:border-purple-500 hover:shadow-2xl">
+                <div class="flex justify-between items-start mb-8">
+                    <div class="p-4 rounded-2xl bg-purple-50 text-purple-600">
+                        <i data-lucide="network"></i>
+                    </div>
+                    <span class="text-[10px] font-black px-3 py-1 rounded-full bg-purple-100 text-purple-700 uppercase tracking-widest">협력 구조 확장</span>
+                </div>
+                <h2 class="text-xl font-black mb-4 text-slate-800 leading-snug">② 네트워크 기반 거버넌스</h2>
+                <p class="text-sm text-slate-500 mb-8 font-medium leading-relaxed">광역-기초 간 접점 강화 및 지자체 간 자원 공유 네트워크 구축</p>
+                <ul class="space-y-5">
+                    <li class="flex gap-3 text-sm text-slate-700 leading-relaxed font-semibold">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 text-purple-500 shrink-0 mt-0.5"></i>
+                        <span>교육·청소년·학생 복지 등 웰빙 카운티와의 필수 협력</span>
+                    </li>
+                    <li class="flex gap-3 text-sm text-slate-700 leading-relaxed font-semibold">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 text-purple-500 shrink-0 mt-0.5"></i>
+                        <span>Kuntayhtymä(공동 지자체 기구) 모델의 확산</span>
+                    </li>
+                    <li class="flex gap-3 text-sm text-slate-700 leading-relaxed font-semibold">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 text-purple-500 shrink-0 mt-0.5"></i>
+                        <span>공공-민간 파트너십을 통한 학교의 지역 거점화</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="pillar-card bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:border-emerald-500 hover:shadow-2xl">
+                <div class="flex justify-between items-start mb-8">
+                    <div class="p-4 rounded-2xl bg-emerald-50 text-emerald-600">
+                        <i data-lucide="zap"></i>
+                    </div>
+                    <span class="text-[10px] font-black px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 uppercase tracking-widest">지역 혁신 장치</span>
+                </div>
+                <h2 class="text-xl font-black mb-4 text-slate-800 leading-snug">③ VET 자율성 확대</h2>
+                <p class="text-sm text-slate-500 mb-8 font-medium leading-relaxed">실험적 인가를 통한 지역 노동시장 맞춤형 교육 자율 설계</p>
+                <ul class="space-y-5">
+                    <li class="flex gap-3 text-sm text-slate-700 leading-relaxed font-semibold">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5"></i>
+                        <span>최대 40개 VET 기관에 폭넓은 실험적 자율성 부여</span>
+                    </li>
+                    <li class="flex gap-3 text-sm text-slate-700 leading-relaxed font-semibold">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5"></i>
+                        <span>지역 수요에 맞춘 영어 프로그램 및 직업 자격 운영</span>
+                    </li>
+                    <li class="flex gap-3 text-sm text-slate-700 leading-relaxed font-semibold">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5"></i>
+                        <span>'목표 합의 – 성과 모니터링' 중심의 패러다임 전환</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="bg-emerald-950 rounded-[3rem] p-10 text-white relative overflow-hidden shadow-2xl shadow-emerald-200/50">
+            <div class="relative z-10">
+                <div class="flex items-center gap-4 mb-10">
+                    <div class="p-3 bg-emerald-500 rounded-2xl shadow-lg shadow-emerald-500/20">
+                        <i data-lucide="shield-check" class="w-8 h-8"></i>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-black tracking-tight">VET 자율성 확대 시범사업 (2026–2033)</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                    <div class="space-y-6">
+                        <div class="bg-white/5 p-6 rounded-3xl border border-white/10 backdrop-blur-sm">
+                            <h4 class="font-black text-emerald-400 mb-2 uppercase text-xs tracking-widest">Experimental Permit</h4>
+                            <p class="text-sm text-emerald-50/80 leading-relaxed font-medium">최대 40개 기관 대상. 영어 프로그램 및 직업 자격의 자율적 설계 권한 부여</p>
+                        </div>
+                        <div class="bg-white/5 p-6 rounded-3xl border border-white/10 backdrop-blur-sm">
+                            <h4 class="font-black text-emerald-400 mb-2 uppercase text-xs tracking-widest">Administrative Shift</h4>
+                            <p class="text-sm text-emerald-50/80 leading-relaxed font-medium">중앙의 세부 규제에서 벗어나 '목표 합의 및 성과 모니터링' 위주로 행정 전환</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col">
+                        <div class="flex items-start gap-5 mb-6">
+                            <div class="bg-emerald-500/20 p-4 rounded-full text-emerald-400 shrink-0">
+                                <i data-lucide="building-2"></i>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] uppercase tracking-[0.2em] text-emerald-500 font-black mb-2">Role Transformation</span>
+                                <p class="text-lg font-bold italic text-white/90 leading-tight">"직업교육기관은 이제 지역 산업 전략과 인력 수급을 연결하는 지역 혁신의 거점으로 기능합니다."</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-[10px] text-emerald-400 font-black bg-emerald-900/50 w-fit px-4 py-2 rounded-full border border-emerald-800 uppercase tracking-widest">
+                            <i data-lucide="info" class="w-4 h-4"></i>
+                            <span>FINEEC 8년 주기 체계적 평가 병행</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="absolute -bottom-20 -right-20 opacity-5 pointer-events-none transform rotate-12">
+                <i data-lucide="gantt-chart-square" style="width: 400px; height: 400px;"></i>
+            </div>
+        </div>
+
+        <footer class="mt-20 text-center text-slate-400 text-[11px] font-black tracking-[0.2em] uppercase py-12 border-t border-slate-200">
+            © 2026 Finnish Education Ecosystem Report | Sivistyskunta Transformation
+        </footer>
+    </div>
+
+    <script>
+        // Lucide 아이콘 초기화
+        lucide.createIcons();
+    </script>
+</body>
+</html>
